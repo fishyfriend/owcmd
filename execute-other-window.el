@@ -76,6 +76,7 @@
   :type 'boolean)
 
 (defcustom eow-cancel-reselect-commands '("^isearch-.*"
+                                          "^query-replace\\(-regexp\\)?$"
                                           recentf-open-file
                                           recentf-open-files)
   "List of commands that cancel reselection of the calling window.
