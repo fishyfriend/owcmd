@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 ;;; execute-other-window.el --- Run a single command in the other window
 
 ;; Copyright (C) 2020 Jacob First
@@ -5,7 +6,7 @@
 ;; Author: Jacob First <jacob.first@member.fsf.org>
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "26.3"))
-;; Keywords: command, convenience, windows
+;; Keywords: convenience
 ;; URL: https://gitlab.com/fishyfriend_/execute-other-window
 
 ;; This file is not part of GNU Emacs.
@@ -35,15 +36,15 @@
 ;; sort of generalization of the built-in commands
 ;; `scroll-other-window' and `scroll-other-window-down'.
 ;;
-;; To use the package, just bind the command `execute-other-window' to
-;; some key combination and you're ready to go.  No minor mode is
+;; To use the package, just bind the command `eow-execute-other-window'
+;; to some key combination and you're ready to go.  No minor mode is
 ;; used.
 ;;
-;;   (define-key global-map (kbd "C-c w") 'execute-other-window)
+;;   (define-key global-map (kbd "C-c w") #'eow-execute-other-window)
 ;;
 ;; If you're using Evil, the following binding is recommended:
 ;;
-;;   (evil-global-set-key 'normal (kbd "C-w C-e") 'execute-other-window)
+;;   (evil-global-set-key 'normal (kbd "C-w C-e") #'eow-execute-other-window)
 ;;
 ;; Now every time you press the shortcut key, Emacs will temporarily
 ;; select the next window until you run another command.  You can press
@@ -68,10 +69,8 @@
 
 ;;; Code:
 
-(require 'seq)
-
 (defcustom eow-cancel-reselect-on-new-window t
-  "Whether to cancel reselecting the calling window after a command selects a new one."
+  "Whether to cancel reselecting the original window after a command selects a new one."
   :group 'execute-other-window
   :type 'boolean)
 
@@ -79,14 +78,14 @@
                                           "^query-replace\\(-regexp\\)?$"
                                           recentf-open-file
                                           recentf-open-files)
-  "List of commands that cancel reselection of the calling window.
+  "List of commands that cancel reselection of the original window.
 Each item is a symbol or string; if a string, it will be interpreted as
 a regexp.  This setting is applied by checking the current command name
 as reported by `this-command' in a post-command hook."
   :group 'execute-other-window
   :type '(repeat (choice symbol regexp)))
 
-(defcustom eow-ignore-commands '(execute-other-window
+(defcustom eow-ignore-commands '(eow-execute-other-window
                                  ;; god-mode compatibility
                                  god-mode-self-insert)
   "List of commands to ignore, checked just after any command completes.
@@ -96,7 +95,7 @@ original window and will not prevent a subsequent command from doing so.
 This setting is applied by checking the current command name as reported
 by `this-command' in a post-command hook.
 
-If you wrap `execute-other-window' in another command, you should add
+If you wrap `eow-execute-other-window' in another command, you should add
 that command's name to `eow-ignore-commands'."
   :group 'execute-other-window
   :type '(repeat (choice symbol regexp)))
@@ -128,22 +127,28 @@ generally use `eow-ignore-commands'."
   "Whether the current command is a prefix command that should be ignored.")
 
 (defvar eow--calling-window nil
-  "The window that was selected when `execute-other-window' was called.")
+  "The original window that was selected when `eow-execute-other-window' was called.")
 
 (defvar eow--target-window nil
-  "The window temporarily selected by `execute-other-window'.")
+  "The window selected by `eow-execute-other-window' for running a command.")
 
-(defun eow--member (symbol listvar)
+(defun eow--match-in-list (symbol listvar)
   "Check whether SYMBOL is a match for any symbol or regexp in LISTVAR."
-  (seq-some (lambda (item)
+  (let* ((items listvar)
+         (found nil))
+    (while (and items (not found))
+      (let ((item (car items)))
+        (setq found
               (cond ((symbolp item) (eq symbol item))
                     ((stringp item) (string-match item (symbol-name symbol)))
-                    (:else nil)))
-            listvar))
+                    (t nil))
+              items
+              (cdr items))))
+    found))
 
 (defun eow--pre-command ()
   "Pre-command hook function to set up execution in other window."
-  (when (eow--member this-command eow-ignore-prefix-commands)
+  (when (eow--match-in-list this-command eow-ignore-prefix-commands)
     (setq eow--ignore-prefix t)))
 
 (defun eow--post-command ()
@@ -151,42 +156,43 @@ generally use `eow-ignore-commands'."
   (if (or eow--ignore-prefix
           (minibuffer-window-active-p (selected-window)))
       (setq eow--ignore-prefix nil)
-    (unless (eow--member this-command eow-ignore-commands)
+    (unless (eow--match-in-list this-command eow-ignore-commands)
       (let ((current-window (selected-window)))
         (when (and (or (eq current-window eow--target-window)
                        (not eow-cancel-reselect-on-new-window))
-                   (not (eow--member this-command eow-cancel-reselect-commands))
+                   (not (eow--match-in-list this-command
+                                            eow-cancel-reselect-commands))
                    (window-live-p eow--calling-window))
           (eow--cancel t))
         (eow--cancel)))))
 
 (defun eow--cancel (&optional reselect)
-  "Stop execution in other window; reselect calling window if RESELECT is non-nil."
+  "Stop execution in other window; reselect original window if RESELECT is non-nil."
   (when (and reselect eow--calling-window)
     (select-window eow--calling-window))
-  (remove-hook 'pre-command-hook 'eow--pre-command)
-  (remove-hook 'post-command-hook 'eow--post-command)
+  (remove-hook 'pre-command-hook #'eow--pre-command)
+  (remove-hook 'post-command-hook #'eow--post-command)
   (setq eow--calling-window nil
         eow--target-window nil
         eow--ignore-prefix nil))
 
 ;;;###autoload
-(defun execute-other-window ()
+(defun eow-execute-other-window ()
   "Switch to the next window temporarily, switching back after the next command.
 
-Running `execute-other-window' multiple times in sequence causes the
+Running `eow-execute-other-window' multiple times in sequence causes the
 window selection to cycle through available windows, similar to what
 `other-window' does.  The original window selection (i.e., the window
-that was selected when `execute-other-window' was run the first time)
+that was selected when `eow-execute-other-window' was run the first time)
 is preserved and is reselected after any other command completes.
 
 By default, reselection of the original window is suppressed after a
-command other than `execute-other-window' changes the window selection.
+command other than `eow-execute-other-window' changes the window selection.
 This behavior is configurable using `eow-cancel-reselect-on-new-window'.
 Reselection is also suppressed if the command just run is present in
 the list `eow-cancel-reselect-commands'.
 
-`execute-other-window' can ignore certain commands so that they
+`eow-execute-other-window' can ignore certain commands so that they
 neither trigger reselection of the original window, nor end the current
 excursion into the other window.  For example, one would usually like to
 ignore a prefix argument and switch back to the original window only
@@ -201,11 +207,11 @@ listed in `eow-ignore-commands'.  (If this were not the case, commands
 like `eval-expression' would not work properly because any minibuffer
 editing would trigger reselection of the original window.)
 
-`execute-other-window' selects windows using `select-window' with the
+`eow-execute-other-window' selects windows using `select-window' with the
 NORECORD argument set to nil.  Thus, any actions that trigger on new
-window selection are likely to be triggered twice when using
-`execute-other-window': once when the target window is selected, and
-again when the calling window is reselected."
+window selection are likely to be triggered when using
+`eow-execute-other-window', both when the other window is selected
+and again when the original window is reselected."
   (interactive)
   (let ((target-window (next-window (selected-window) 'no-minibuffer)))
     (cond ((eq target-window eow--calling-window)
@@ -214,15 +220,19 @@ again when the calling window is reselected."
           ((eq target-window (selected-window))
            (message "No other window")
            (eow--cancel))
-          (:else
+          (t
            (unless eow--calling-window
              (setq eow--calling-window (selected-window)))
            (setq eow--target-window target-window)
-           (add-hook 'pre-command-hook 'eow--pre-command)
-           (add-hook 'post-command-hook 'eow--post-command)
+           (add-hook 'pre-command-hook #'eow--pre-command)
+           (add-hook 'post-command-hook #'eow--post-command)
            (select-window target-window)
            (message "Executing next command in the other window ...")))))
 
 (provide 'execute-other-window)
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 
 ;;; execute-other-window.el ends here
