@@ -189,6 +189,8 @@ This behavior is configurable using `eow-cancel-reselect-on-new-window'.
 Reselection is also suppressed if the command just run is present in
 the list `eow-cancel-reselect-commands'.
 
+Ignoring commands:
+
 `eow-execute-other-window' can ignore certain commands so that they
 neither trigger reselection of the original window, nor end the current
 excursion into the other window.  For example, one would usually like to
@@ -203,6 +205,11 @@ minibuffer window is selected are ignored, just as though they were
 listed in `eow-ignore-commands'.  (If this were not the case, commands
 like `eval-expression' would not work properly because any minibuffer
 editing would trigger reselection of the original window.)
+
+If you wrap `eow-execute-other-window' in another command, you should add
+that command's name to `eow-ignore-commands'.
+
+Quirks:
 
 `eow-execute-other-window' selects windows using `select-window' with the
 NORECORD argument set to nil.  Thus, any actions that trigger on new
