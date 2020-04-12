@@ -70,7 +70,7 @@
 ;;; Code:
 
 (defcustom eow-cancel-reselect-on-new-window t
-  "Whether to cancel reselecting the original window after a command selects a new one."
+  "Don't reselect original window if the command selected a window."
   :group 'execute-other-window
   :type 'boolean)
 
@@ -88,7 +88,7 @@ as reported by `this-command' in a post-command hook."
 (defcustom eow-ignore-commands '(eow-execute-other-window
                                  ;; god-mode compatibility
                                  god-mode-self-insert)
-  "List of commands to ignore, checked just after any command completes.
+  "List of commands to ignore, checked just after a command completes.
 Each item is a symbol or string; if a string, it will be interpreted as
 a regexp.  Commands in this list will not trigger reselection of the
 original window and will not prevent a subsequent command from doing so.
@@ -124,16 +124,16 @@ generally use `eow-ignore-commands'."
   :type '(repeat (choice symbol regexp)))
 
 (defvar eow--ignore-prefix nil
-  "Whether the current command is a prefix command that should be ignored.")
+  "Whether current command is an ignored prefix command.")
 
 (defvar eow--calling-window nil
-  "The original window that was selected when `eow-execute-other-window' was called.")
+  "The selected window when `eow-execute-other-window' was called.")
 
 (defvar eow--target-window nil
-  "The window selected by `eow-execute-other-window' for running a command.")
+  "The window selected for running a command.")
 
 (defun eow--match-in-list (symbol listvar)
-  "Check whether SYMBOL is a match for any symbol or regexp in LISTVAR."
+  "Check whether SYMBOL matches any symbol or regexp in LISTVAR."
   (let* ((items listvar)
          (found nil))
     (while (and items (not found))
@@ -175,7 +175,7 @@ generally use `eow-ignore-commands'."
 
 ;;;###autoload
 (defun eow-execute-other-window ()
-  "Switch to the next window temporarily, switching back after the next command.
+  "Switch to the next window, switching back after the next command.
 
 Running `eow-execute-other-window' multiple times in sequence causes the
 window selection to cycle through available windows, similar to what
