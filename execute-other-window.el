@@ -59,9 +59,9 @@
 ;;     the other window.
 ;;   - Type "C-x 2" to split the first window again.
 ;;   - Type "C-c w" several times to cycle through the open windows,
-;;     then type "<up>" to move point up in the selected window.  Do
-;;     this again, now selecting a different window.  Notice that the
-;;     original window is reselected each time.
+;;     then type a movement key to move point in the selected window.
+;;     Do this again, this time selecting a different window.  Notice
+;;     that the original window gets reselected each time.
 ;;
 ;; As this example shows, prefix arguments are supported by default.
 ;; You can configure this and other aspects of the package's behavior
@@ -146,32 +146,29 @@ generally use `eow-ignore-commands'."
               (cdr items))))
     found))
 
-(defun eow--pre-command ()
-  "Pre-command hook function to set up execution in other window."
+(defun eow--handle-command-pre ()
+  "Set up global state for handling prefix commands."
   (when (eow--match-in-list this-command eow-ignore-prefix-commands)
     (setq eow--ignore-prefix t)))
 
-(defun eow--post-command ()
-  "Post-command hook function to clean up after execution in other window."
-  (if (or eow--ignore-prefix
-          (minibuffer-window-active-p (selected-window)))
+(defun eow--handle-command-post ()
+  "Select original window if appropriate, and update global state."
+  (if eow--ignore-prefix
       (setq eow--ignore-prefix nil)
-    (unless (eow--match-in-list this-command eow-ignore-commands)
-      (let ((current-window (selected-window)))
-        (when (and (or (eq current-window eow--target-window)
-                       (not eow-cancel-reselect-on-new-window))
-                   (not (eow--match-in-list this-command
-                                            eow-cancel-reselect-commands))
-                   (window-live-p eow--calling-window))
-          (eow--cancel t))
-        (eow--cancel)))))
+    (unless (or (eow--match-in-list this-command eow-ignore-commands)
+                (minibuffer-window-active-p (selected-window)))
+      (when (and (not (eow--match-in-list this-command
+                                          eow-cancel-reselect-commands))
+                 (or (eq (selected-window) eow--target-window)
+                     (not eow-cancel-reselect-on-new-window))
+                 (window-live-p eow--calling-window))
+        (select-window eow--calling-window))
+      (eow--clean-up-state))))
 
-(defun eow--cancel (&optional reselect)
-  "Stop execution in other window; reselect original window if RESELECT is non-nil."
-  (when (and reselect eow--calling-window)
-    (select-window eow--calling-window))
-  (remove-hook 'pre-command-hook #'eow--pre-command)
-  (remove-hook 'post-command-hook #'eow--post-command)
+(defun eow--clean-up-state ()
+  "Return global environment to default state."
+  (remove-hook 'pre-command-hook #'eow--handle-command-pre)
+  (remove-hook 'post-command-hook #'eow--handle-command-post)
   (setq eow--calling-window nil
         eow--target-window nil
         eow--ignore-prefix nil))
@@ -223,20 +220,21 @@ suggested keybindings for the command just run.  It is likely to be
 fixed in a future version of Emacs."
   (interactive)
   (let ((target-window (next-window (selected-window) 'no-minibuffer)))
-    (cond ((eq target-window eow--calling-window)
+    (cond ((eq target-window eow--calling-window) ; user has cycled around
            (message "Execution in other window cancelled")
-           (eow--cancel t))
+           (select-window target-window)
+           (eow--clean-up-state))
           ((eq target-window (selected-window))
            (message "No other window")
-           (eow--cancel))
+           (eow--clean-up-state))
           (t
            (unless eow--calling-window
              (setq eow--calling-window (selected-window)))
            (setq eow--target-window target-window)
-           (add-hook 'pre-command-hook #'eow--pre-command)
-           (add-hook 'post-command-hook #'eow--post-command)
+           (add-hook 'pre-command-hook #'eow--handle-command-pre)
+           (add-hook 'post-command-hook #'eow--handle-command-post)
            (select-window target-window)
-           (message "Executing next command in the other window ...")))))
+           (message "Executing next command in other window ...")))))
 
 (provide 'execute-other-window)
 
