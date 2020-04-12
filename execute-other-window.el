@@ -236,7 +236,7 @@ original window will be reselected immediately, so this issue should
 not interrupt your workflow.  (The odd behavior is due to an
 implementation quirk of the way `execute-extended-command' displays
 suggested keybindings for the command just run.  It is likely to be
-fixed in a future version of Emacs."
+fixed in a future version of Emacs.)"
   (interactive)
   (let ((target-window (next-window (selected-window) 'no-minibuffer)))
     (cond ((eq target-window eow--calling-window) ; user has cycled around
