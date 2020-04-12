@@ -36,6 +36,15 @@
 ;; sort of generalization of the built-in commands
 ;; `scroll-other-window' and `scroll-other-window-down'.
 ;;
+;; Installation:
+;;
+;; Put execute-other-window.el somewhere in your `load-path', then
+;; load it.
+;;
+;;   (require 'execute-other-window)
+;;
+;; Quickstart:
+
 ;; To use the package, just bind the command `eow-execute-other-window'
 ;; to some key combination and you're ready to go.  No minor mode is
 ;; used.
@@ -64,8 +73,11 @@
 ;;     that the original window gets reselected each time.
 ;;
 ;; As this example shows, prefix arguments are supported by default.
-;; You can configure this and other aspects of the package's behavior
-;; through several variables whose names are prefixed with "eow-".
+;;
+;; Configuration:
+;;
+;; You can configure the package's behavior through variables whose
+;; names are prefixed with "eow-".
 
 ;;; Code:
 
