@@ -211,7 +211,16 @@ editing would trigger reselection of the original window.)
 NORECORD argument set to nil.  Thus, any actions that trigger on new
 window selection are likely to be triggered when using
 `eow-execute-other-window', both when the other window is selected
-and again when the original window is reselected."
+and again when the original window is reselected.
+
+You may observe a 4s delay in returning to the original window after
+executing a command via `execute-extended-command' (bound to \\<global-map>\\[execute-extended-command]).
+If you type text or run any other command during the delay, the
+original window will be reselected immediately, so this issue should
+not interrupt your workflow.  (The odd behavior is due to an
+implementation quirk of the way `execute-extended-command' displays
+suggested keybindings for the command just run.  It is likely to be
+fixed in a future version of Emacs."
   (interactive)
   (let ((target-window (next-window (selected-window) 'no-minibuffer)))
     (cond ((eq target-window eow--calling-window)
