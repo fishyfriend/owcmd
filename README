@@ -9,8 +9,8 @@ see the Commentary section in execute-other-window.el.
 CONTRIBUTING
 
 Please use this package and report any problems you encounter by opening an
-issue in the GitLab project. Merge requests with bugfixes or other improvements
-are also welcome.
+issue on GitHub. Pull requests with bugfixes or other improvements are also
+welcome!
 
 ALTERNATIVES
 
@@ -18,6 +18,5 @@ owdriver (https://github.com/aki2o/owdriver)
 
 COPYRIGHT
 
-Copyright (C) 2020 Jacob First (GPLv3+)
-GitLab project avatar copyright (C) 2015-2019 Free Software Foundation (GPLv3+)
+Copyright (C) 2020 Jacob First
 See LICENSE for full license information.

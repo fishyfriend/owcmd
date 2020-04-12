@@ -7,7 +7,7 @@
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "26.3"))
 ;; Keywords: convenience
-;; URL: https://gitlab.com/fishyfriend_/execute-other-window
+;; URL: https://github.com/fishyfriend/execute-other-window
 
 ;; This file is not part of GNU Emacs.
 
