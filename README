@@ -1,10 +1,10 @@
-execute-other-window.el provides a command to switch to the next window, run a
-command, then switch back to the original window automatically. Use it to save
-keystrokes when you need to do just one thing in the other window, like scroll
-the buffer, jump to a definition, paste some text, or quit a temporary buffer.
-It is a sort of generalization of the built-in commands `scroll-other-window'
-and `scroll-other-window-down'. For a full description and setup instructions,
-see the Commentary section in execute-other-window.el.
+owcmd.el provides a command to switch to the next window, run a command, then
+switch back to the original window automatically. Use it to save keystrokes when
+you need to do just one thing in the other window, like scroll the buffer, jump
+to a definition, paste some text, or quit a temporary buffer.  It is a sort of
+generalization of the built-in commands `scroll-other-window' and
+`scroll-other-window-down'. For a full description and setup instructions, see
+the Commentary section in owcmd.el.
 
 CONTRIBUTING
 
