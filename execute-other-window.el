@@ -1,5 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-;;; execute-other-window.el --- Run a single command in the other window
+;;; execute-other-window.el --- Run a single command in the other window -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020 Jacob First
 
@@ -145,7 +144,7 @@ generally use `eow-ignore-commands'."
   "The window selected for running a command.")
 
 (defun eow--match-in-list (symbol listvar)
-  "Check whether SYMBOL matches any symbol or regexp in LISTVAR."
+  "Return t if SYMBOL is a match for any symbol or regexp in LISTVAR."
   (let* ((items listvar)
          (found nil))
     (while (and items (not found))
