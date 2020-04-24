@@ -24,7 +24,6 @@ key. owdriver provides a number of convenient features missing from owcmd:
     a single press of the "prefix" key
   - Built-in commands for changing the other window
   - Built-in command to stay in the other window permanently
-  - Support for isearch (hopefully owcmd will get this in the future)
   - avy-like selection of other window via pophint integration
   - Easily customize other window commands to use different keybindings from
     their defaults
