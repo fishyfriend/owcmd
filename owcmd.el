@@ -34,6 +34,10 @@
 ;; or quit a temporary buffer.  It is a sort of generalization of the
 ;; built-in commands `scroll-other-window' and `scroll-other-window-down'.
 ;;
+;; This commentary provides a getting-started guide.  For additional
+;; details including alternative packages and information for
+;; contributors, see the README file at this package's homepage URL.
+;;
 ;; Installation:
 ;;
 ;; Put owcmd.el somewhere in your `load-path', then load it.

@@ -3,8 +3,10 @@ switch back to the original window automatically. Use it to save keystrokes when
 you need to do just one thing in the other window, like scroll the buffer, jump
 to a definition, paste some text, or quit a temporary buffer.  It is a sort of
 generalization of the built-in commands `scroll-other-window' and
-`scroll-other-window-down'. For a full description and setup instructions, see
-the Commentary section in owcmd.el.
+`scroll-other-window-down'.
+
+See the Commentary section in owcmd.el for installation instructions and a
+quickstart guide.
 
 CONTRIBUTING
 
@@ -14,7 +16,45 @@ welcome!
 
 ALTERNATIVES
 
-owdriver (https://github.com/aki2o/owdriver)
+owdriver (https://github.com/aki2o/owdriver), like owcmd, implements the general
+idea of executing commands in the other window by means of a prefix
+key. owdriver provides a number of convenient features missing from owcmd:
+
+  - Ability to run multiple commands in the other window sequentially with only
+    a single press of the "prefix" key
+  - Built-in commands for changing the other window
+  - Built-in command to stay in the other window permanently
+  - Support for isearch (hopefully owcmd will get this in the future)
+  - avy-like selection of other window via pophint integration
+  - Easily customize other window commands to use different keybindings from
+    their defaults
+  - Visual indication of window selection (however, it appears to flash all
+    windows displaying the same buffer)
+  - more?
+
+owdriver predates owcmd. owcmd's name has been chosen to reflect its similarity
+to the earlier package as well as its more focused (i.e., limited) usage style:
+single commands, vs. driving the other window.
+
+owcmd's main advantages relate to its approach to keybindings. Whereas owdriver
+maintains a separate map of user-configured keybindings for the other window,
+owcmd avoids interacting with keymaps entirely and just uses the current
+bindings from the environment.
+
+Advantages of owcmd:
+
+  - Most keybindings work automatically without configuration. In owdriver,
+    commands must be bound individually aside from 25 or so defaults.
+  - Changes to active keymaps are recognized immediately
+  - No need to memorize a separate set of shortcuts for other window commands.
+    This is helpful when conflicting keybindings are active in different
+    buffers: both commands can be used with their default bindings instead of
+    having to bind separate keys in the other window command map.
+  - Built-in support for God Mode and Evil God State
+  - More compatible generally with keymap trickery, as owcmd doesn't touch
+    keymaps. (I.e., something similar to God Mode should not be hard to
+    support.)
+  - Zero dependencies
 
 COPYRIGHT
 
