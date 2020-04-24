@@ -39,9 +39,7 @@ single commands, vs. driving the other window.
 owcmd's main advantages relate to its approach to keybindings. Whereas owdriver
 maintains a separate map of user-configured keybindings for the other window,
 owcmd avoids interacting with keymaps entirely and just uses the current
-bindings from the environment.
-
-Advantages of owcmd:
+bindings from the environment. Advantages of owcmd:
 
   - Most keybindings work automatically without configuration. In owdriver,
     commands must be bound individually aside from 25 or so defaults.
