@@ -107,6 +107,8 @@ reported by `this-command' in a post-command hook."
     "^isearch-.*"
     (not . "^isearch-\\(abort\\|cancel\\|exit\\)$")
     "^query-replace\\(-regexp\\)?$"
+    ;; evil compatibility
+    "^evil-search-\\(forward\\|backward\\)$"
     ;; god-mode compatibility
     god-mode-self-insert)
   "List of commands to ignore, checked just after a command completes.
