@@ -131,6 +131,9 @@ add that command's name to `owcmd-ignore-commands'."
                                           universal-argument-minus
                                           universal-argument-more
                                           universal-argument-other-key
+                                          ;; evil compatibility
+                                          evil-execute-in-emacs-state
+                                          evil-execute-in-normal-state
                                           ;; evil-god-state compatibility
                                           evil-execute-in-god-state)
   "List of commands to ignore, checked just before any command is run.
