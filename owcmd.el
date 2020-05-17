@@ -128,9 +128,8 @@ add that command's name to `owcmd-ignore-commands'."
 
 (defcustom owcmd-ignore-prefix-commands '(digit-argument
                                           negative-argument
-                                          universal-argument-minus
+                                          universal-argument
                                           universal-argument-more
-                                          universal-argument-other-key
                                           ;; evil compatibility
                                           evil-execute-in-emacs-state
                                           evil-execute-in-normal-state
