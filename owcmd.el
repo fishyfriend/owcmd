@@ -86,6 +86,11 @@
 
 ;;; Code:
 
+(defgroup owcmd nil
+  "Execute a command in the other window."
+  :group 'convenience
+  :prefix "owcmd-")
+
 (defcustom owcmd-cancel-reselect-on-new-window t
   "Don't reselect original window if the command selected a window."
   :group 'owcmd
